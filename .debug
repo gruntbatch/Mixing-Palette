@@ -1,0 +1,8 @@
+<ExtensionList>
+    <Extension Id="com.github.gruntbatch.mixer.panel">
+        <HostList>
+            <Host Name="PHXS" Port="8090"/>
+            <Host Name="PHSP" Port="8090"/>
+        </HostList>
+    </Extension>
+</ExtensionList>
