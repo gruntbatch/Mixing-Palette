@@ -33,54 +33,45 @@ function setForegroundRGB([r, g, b]) {
     csInterface.evalScript(`setForegroundRGB(${r}, ${g}, ${b})`);
 }
 
-// All colors are stored in RGB
 const SWATCH_COUNT = 6;
 const FLEX = document.querySelector("#flex")
-const SWATCHES = new Array(SWATCH_COUNT);
+const SWATCHES = new Array(SWATCH_COUNT).fill([0, 0, 0]);
 
 function createButtons() {
-    for (let i=0; i<SWATCH_COUNT; i++) {
+    SWATCHES.forEach((value, index) => {
         e = document.createElement("div");
-        e.onclick = onClick;
-        e.oncontextmenu = onContextMenu;
-        setColor(e, [0, 0, 0]);
         FLEX.appendChild(e);
-        SWATCHES[i] = e;
-    }
+
+        e.index = index;
+        setStyle(e, value);
+
+        e.onclick = (event) => {
+            let e = event.target;
+            getForegroundRGB().then((rgb) => {
+                rgb = lerpRGB(rgb, SWATCHES[e.index], 0.1);
+                setForegroundRGB(rgb);
+            });
+        }
+
+        e.oncontextmenu = (event) => {
+            event.preventDefault();
+            let e = event.target;
+            getForegroundRGB().then((rgb) => {
+                SWATCHES[e.index] = rgb;
+                setStyle(e, rgb);
+            });
+        };
+    });
 }
 
-function setColor(e, [r, g, b]) {
-    e.dataset.r = r;
-    e.dataset.g = g;
-    e.dataset.b = b;
-    e.style.background = `rgb(${e.dataset.r}, ${e.dataset.g}, ${e.dataset.b})`;
-}
-
-function getColor(e) {
-    return [e.dataset.r, e.dataset.g, e.dataset.b];
+function setStyle(e, [r, g, b]) {
+    e.style.background = `rgb(${r}, ${g}, ${b})`;
 }
 
 // Initialize the panel.
 (_ => {
     createButtons();
 })();
-
-// Listen for canvas events
-function onClick(event) {
-    let e = event.target;
-    getForegroundRGB().then((rgb) => {
-        rgb = lerpRGB(rgb, getColor(e), 0.2);
-        setForegroundRGB(rgb);
-    });
-}
-
-function onContextMenu(event) {
-    event.preventDefault();
-    let e = event.target;
-    getForegroundRGB().then((rgb) => {
-        setColor(e, rgb);
-    });
-}
 
 function lerpRGB(a, b, t) {
     return [

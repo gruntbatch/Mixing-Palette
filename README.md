@@ -1,5 +1,9 @@
 # Mixer
 
+- [ ] Save and restore state
+- [ ] Variable blending
+- ~~[ ] Switch to HSB~~
+
 ## Installation
 
 ## Inspiration
