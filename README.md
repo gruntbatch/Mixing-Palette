@@ -1,6 +1,6 @@
 # Mixer
 
-- [ ] Save and restore state
+- [x] Save and restore state
 - [ ] Variable blending
 - ~~[ ] Switch to HSB~~
 

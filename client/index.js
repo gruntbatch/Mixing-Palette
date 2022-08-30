@@ -14,13 +14,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-const EVENT_EXCH = 1165517672; // "Exch"
-const EVENT_RSET = 1383294324; // "Rset"
-const EVENT_SETD = 1936028772; // "setd"
-
 // Establish a line of communication with the host
 const csInterface = new CSInterface();
-const extensionId = csInterface.getExtensionID();
 
 function getForegroundRGB() {
     return new Promise((resolve, reject) => {
@@ -33,11 +28,12 @@ function setForegroundRGB([r, g, b]) {
     csInterface.evalScript(`setForegroundRGB(${r}, ${g}, ${b})`);
 }
 
-const SWATCH_COUNT = 6;
 const FLEX = document.querySelector("#flex")
-const SWATCHES = new Array(SWATCH_COUNT).fill([0, 0, 0]);
+let SWATCHES;
 
-function createButtons() {
+// Initialize the panel.
+(_ => {
+    SWATCHES = load();
     SWATCHES.forEach((value, index) => {
         e = document.createElement("div");
         FLEX.appendChild(e);
@@ -57,21 +53,36 @@ function createButtons() {
             event.preventDefault();
             let e = event.target;
             getForegroundRGB().then((rgb) => {
-                SWATCHES[e.index] = rgb;
                 setStyle(e, rgb);
+                SWATCHES[e.index] = rgb;
+                save(SWATCHES);
             });
         };
+    });
+})();
+
+function load() {
+    const get = key => Number(window.localStorage.getItem(key)) || 0;
+    return new Array(get("sc") || 6).fill([0, 0, 0]).map((_, index) => [
+        get(`s${index}r`),
+        get(`s${index}g`),
+        get(`s${index}b`),
+    ]);
+}
+
+function save(swatches) {
+    const set = (key, value) => window.localStorage.setItem(key, value);
+    set("sc", swatches.length);
+    swatches.forEach(([r, g, b], index) => {
+        set(`s${index}r`, r);
+        set(`s${index}g`, g);
+        set(`s${index}b`, b);
     });
 }
 
 function setStyle(e, [r, g, b]) {
     e.style.background = `rgb(${r}, ${g}, ${b})`;
 }
-
-// Initialize the panel.
-(_ => {
-    createButtons();
-})();
 
 function lerpRGB(a, b, t) {
     return [
