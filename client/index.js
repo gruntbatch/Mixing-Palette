@@ -28,12 +28,15 @@ function setForegroundRGB([r, g, b]) {
     csInterface.evalScript(`setForegroundRGB(${r}, ${g}, ${b})`);
 }
 
-const FLEX = document.querySelector("#flex")
-let SWATCHES;
-
 // Initialize the panel.
 (_ => {
-    SWATCHES = load();
+    const MIX_FACTOR = 0.25;
+    const FLEX = document.querySelector("#flex")
+    const REM = parseFloat(getComputedStyle(document.documentElement).fontSize);
+    let LAST_POS = null;
+    let SWATCHES = load();
+    let INDEX = 0;
+    // let START = 0;
     SWATCHES.forEach((value, index) => {
         e = document.createElement("div");
         FLEX.appendChild(e);
@@ -41,15 +44,25 @@ let SWATCHES;
         e.index = index;
         setStyle(e, value);
 
-        e.onclick = (event) => {
-            let e = event.target;
-            getForegroundRGB().then((rgb) => {
-                rgb = lerpRGB(rgb, SWATCHES[e.index], 0.1);
-                setForegroundRGB(rgb);
-            });
+        e.onmousedown = event => {
+            INDEX = event.target.index;
+            LAST_POS = [event.clientX, event.clientY];
+            window.onmousemove = event => {
+                const pos = [event.clientX, event.clientY];
+                const movement = distance(pos, LAST_POS);
+                LAST_POS = pos;
+                getForegroundRGB().then(rgb => {
+                    rgb = lerpRGB(rgb, SWATCHES[INDEX], MIX_FACTOR * (movement / REM));
+                    setForegroundRGB(rgb);
+                });
+            }
+            window.onmouseup = _ => {
+                window.onmousemove = null;
+                window.onmouseup = null;
+            }
         }
 
-        e.oncontextmenu = (event) => {
+        e.oncontextmenu = event => {
             event.preventDefault();
             let e = event.target;
             getForegroundRGB().then((rgb) => {
@@ -94,4 +107,10 @@ function lerpRGB(a, b, t) {
 
 function lerp(a, b, t) {
     return a * (1.0 - t) + b * t;
+}
+
+function distance([x1, y1], [x2, y2]) {
+    const x = x2 - x1;
+    const y = y2 - y1;
+    return Math.sqrt(x * x + y * y);
 }
