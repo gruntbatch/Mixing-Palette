@@ -1,12 +1,20 @@
 # Mixer
 
-- [x] Save and restore state
-- [ ] Variable blending
-- ~~[ ] Switch to HSB~~
+Mixer is in an alpha condition.
+
+Right-click on a swatch to store the current foreground color.
+
+Left-click-and-drag on a swatch to mix the swatch with the current foreground color. The speed with which you drag will effect the amount of color you pick up. 
+
+## Further Development
+
+- Randomize colors
+- Save and load swatches to `.json` files
+- Allow more or less than six colors
 
 ## Installation
 
-## Inspiration
+TODO
 
 ## License
 

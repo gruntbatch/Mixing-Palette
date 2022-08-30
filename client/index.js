@@ -76,10 +76,11 @@ function setForegroundRGB([r, g, b]) {
 
 function load() {
     const get = key => Number(window.localStorage.getItem(key)) || 0;
+    const pastel = () => 127 + Math.random() * 128;
     return new Array(get("sc") || 6).fill([0, 0, 0]).map((_, index) => [
-        get(`s${index}r`),
-        get(`s${index}g`),
-        get(`s${index}b`),
+        get(`s${index}r`) || pastel(),
+        get(`s${index}g`) || pastel(),
+        get(`s${index}b`) || pastel(),
     ]);
 }
 
